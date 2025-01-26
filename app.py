@@ -15,6 +15,18 @@ app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 200MB max file size
 
 s3 = boto3.client('s3')
 
+def get_signed_url(filename, expiration=3600):
+    """Generate a signed URL for an S3 object that expires in 1 hour"""
+    url = s3.generate_presigned_url(
+        'get_object',
+        Params={
+            'Bucket': os.getenv('S3_BUCKET'),
+            'Key': filename
+        },
+        ExpiresIn=expiration
+    )
+    return url
+
 def process_file(file, strings_to_remove, process_filename):
     print(f"\nProcessing EPUB file: {file.filename}")
     
