@@ -12,6 +12,12 @@
         .animate-spin {
             animation: spin 1s linear infinite;
         }
+        .suggestion {
+            @apply inline-flex items-center px-3 py-1 rounded-full bg-gray-100 text-sm text-gray-700 hover:bg-gray-200 cursor-pointer transition-colors;
+        }
+        .suggestion .remove {
+            @apply ml-2 text-red-500 hover:text-red-700;
+        }
     </style>
 </head>
 <body>
