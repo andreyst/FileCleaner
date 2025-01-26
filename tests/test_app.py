@@ -13,7 +13,7 @@ def test_homepage(client):
 
 def test_upload_without_file(client):
     """Test upload without file"""
-    response = client.post('/')
+    response = client.post('/', follow_redirects=True)
     assert response.status_code == 400
     assert b'No files uploaded' in response.data
 
@@ -24,7 +24,7 @@ def test_process_file_content(client, mock_s3_bucket, sample_epub):
         'strings': ['REMOVE_THIS'],
         'process_filename': 'true'
     }
-    response = client.post('/', data=data, content_type='multipart/form-data')
+    response = client.post('/?process=true', data=data, content_type='multipart/form-data')
     assert response.status_code == 200
     assert b'Files Processed Successfully' in response.data
     assert b'test.epub' in response.data
@@ -37,7 +37,7 @@ def test_process_filename(client, mock_s3_bucket, sample_epub):
         'strings': ['REMOVE_THIS'],
         'process_filename': 'true'
     }
-    response = client.post('/', data=data, content_type='multipart/form-data')
+    response = client.post('/?process=true', data=data, content_type='multipart/form-data')
     assert response.status_code == 200
     assert b'_test.epub' in response.data
     assert b'REMOVE_THIS' not in response.data
@@ -50,7 +50,7 @@ def test_file_size_limit(client):
         'files': (large_file, 'large.epub'),
         'strings': ['test']
     }
-    response = client.post('/', data=data, content_type='multipart/form-data')
+    response = client.post('/?process=true', data=data, content_type='multipart/form-data')
     assert response.status_code == 413  # Request Entity Too Large
 
 def test_multiple_files(client, mock_s3_bucket, sample_epub):
@@ -62,7 +62,7 @@ def test_multiple_files(client, mock_s3_bucket, sample_epub):
         ],
         'strings': ['REMOVE_THIS']
     }
-    response = client.post('/', data=data, content_type='multipart/form-data')
+    response = client.post('/?process=true', data=data, content_type='multipart/form-data')
     assert response.status_code == 200
     assert b'test1.epub' in response.data
     assert b'test2.epub' in response.data
@@ -73,6 +73,6 @@ def test_multiple_strings(client, mock_s3_bucket, sample_epub):
         'files': (BytesIO(sample_epub), 'test.epub'),
         'strings': ['REMOVE_THIS', 'text']
     }
-    response = client.post('/', data=data, content_type='multipart/form-data')
+    response = client.post('/?process=true', data=data, content_type='multipart/form-data')
     assert response.status_code == 200
     assert b'test.epub' in response.data
