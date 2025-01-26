@@ -9,11 +9,7 @@ load_dotenv()
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 15 * 1024 * 1024  # 15MB max file size
 
-s3 = boto3.client('s3',
-    aws_access_key_id=os.getenv('AWS_ACCESS_KEY_ID'),
-    aws_secret_access_key=os.getenv('AWS_SECRET_ACCESS_KEY'),
-    region_name=os.getenv('AWS_REGION')
-)
+s3 = boto3.client('s3')
 
 def process_file(file, strings_to_remove, process_filename):
     filename = secure_filename(file.filename)
