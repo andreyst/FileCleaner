@@ -48,7 +48,7 @@
 </head>
 <body>
     <h1>Upload and Clean Files</h1>
-    <form method="POST" enctype="multipart/form-data" onsubmit="saveStringsOnSubmit(event)">
+    <form action="/?process=true" method="POST" enctype="multipart/form-data" onsubmit="saveStringsOnSubmit(event)">
         <div class="form-group">
             <label>Select files (max {{ max_file_size_mb }}MB each):</label><br>
             <input type="file" name="files" multiple required>

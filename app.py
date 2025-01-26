@@ -142,20 +142,23 @@ def process_file(file, strings_to_remove, process_filename):
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
-        if 'files' not in request.files:
-            return 'No files uploaded', 400
-        
-        files = request.files.getlist('files')
-        strings_to_remove = request.form.getlist('strings')
-        process_filename = 'process_filename' in request.form
-        
-        processed_files = []
-        for file in files:
-            if file.filename:
-                filename, signed_url = process_file(file, strings_to_remove, process_filename)
-                processed_files.append({'name': filename, 'url': signed_url})
-        
-        return render_template('result.html', processed_files=processed_files, max_file_size_mb=MAX_FILE_SIZE_MB)
+        if request.args.get('process'):
+            if 'files' not in request.files:
+                return 'No files uploaded', 400
+            
+            files = request.files.getlist('files')
+            strings_to_remove = request.form.getlist('strings')
+            process_filename = 'process_filename' in request.form
+            
+            processed_files = []
+            for file in files:
+                if file.filename:
+                    filename, signed_url = process_file(file, strings_to_remove, process_filename)
+                    processed_files.append({'name': filename, 'url': signed_url})
+            
+            return render_template('result.html', processed_files=processed_files, max_file_size_mb=MAX_FILE_SIZE_MB)
+        else:
+            return render_template('processing.html')
     
     return render_template('upload.html', max_file_size_mb=app.config['MAX_FILE_SIZE_MB'])
 
