@@ -12,32 +12,40 @@ app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 200MB max file size
 s3 = boto3.client('s3')
 
 def process_file(file, strings_to_remove, process_filename):
+    print(f"\nProcessing file: {file.filename}")
+    
     filename = secure_filename(file.filename)
     if process_filename:
         for s in strings_to_remove:
             filename = filename.replace(s, '')
+        print(f"Processed filename: {filename}")
     
     # Read file content as binary
     content = file.read()
+    print(f"Read {len(content)} bytes")
     
     # Only process text if strings need to be removed
     if strings_to_remove:
         try:
             # Try to decode as text if strings need to be removed
             text_content = content.decode('utf-8')
+            print("File decoded as text, processing strings...")
             for s in strings_to_remove:
                 text_content = text_content.replace(s, '')
             content = text_content.encode('utf-8')
+            print("String processing complete")
         except UnicodeDecodeError:
-            # If file is binary, skip string replacement
+            print("Binary file detected, skipping string replacement")
             pass
     
     # Upload to S3
+    print(f"Uploading to S3: {filename}")
     s3.put_object(
         Bucket=os.getenv('S3_BUCKET'),
         Key=filename,
         Body=content
     )
+    print("Upload complete")
     
     return filename
 
