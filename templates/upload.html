@@ -176,10 +176,7 @@
                 <input type="text" name="strings" placeholder="Enter string to remove" onkeydown="handleInputKeydown(event)">
                 <button type="button" class="remove-btn" onclick="removeStringInput(this)">×</button>
             `;
-            document.getElementById('strings-container').insertBefore(
-                div,
-                document.querySelector('button[type="button"]')
-            );
+            document.getElementById('strings-container').appendChild(div);
         }
 
         // Save all strings when form is submitted
