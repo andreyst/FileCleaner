@@ -9,7 +9,7 @@ def test_homepage(client):
     response = client.get('/')
     assert response.status_code == 200
     assert b'Upload and Process Files' in response.data
-    assert b'max 10MB' in response.data
+    assert b'max 200MB' in response.data
 
 def test_upload_without_file(client):
     """Test upload without file"""
@@ -44,14 +44,14 @@ def test_process_filename(client, mock_s3_bucket, sample_epub):
 
 def test_file_size_limit(client):
     """Test file size limit"""
-    large_file = BytesIO(b'x' * (11 * 1024 * 1024))  # 11MB file
+    # Create a file larger than MAX_FILE_SIZE_MB
+    large_file = BytesIO(b'PK\x03\x04' + b'x' * (201 * 1024 * 1024))  # 201MB file with ZIP header
     data = {
         'files': (large_file, 'large.epub'),
         'strings': ['test']
     }
-    with pytest.raises(Exception) as e:
-        client.post('/', data=data, content_type='multipart/form-data')
-    assert 'Request Entity Too Large' in str(e.value)
+    response = client.post('/', data=data, content_type='multipart/form-data')
+    assert response.status_code == 413  # Request Entity Too Large
 
 def test_multiple_files(client, mock_s3_bucket, sample_epub):
     """Test uploading multiple files"""
