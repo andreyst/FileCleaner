@@ -15,6 +15,7 @@ app = Flask(__name__)
 # Get max file size from environment or use default
 MAX_FILE_SIZE_MB = int(os.getenv('MAX_FILE_SIZE_MB', 200))
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE_MB * 1024 * 1024  # Convert MB to bytes
+app.config['MAX_FILE_SIZE_MB'] = MAX_FILE_SIZE_MB  # Store in config for template access
 
 s3 = boto3.client('s3')
 
@@ -156,7 +157,7 @@ def upload_file():
         
         return render_template('result.html', processed_files=processed_files, max_file_size_mb=MAX_FILE_SIZE_MB)
     
-    return render_template('upload.html', max_file_size_mb=MAX_FILE_SIZE_MB)
+    return render_template('upload.html', max_file_size_mb=app.config['MAX_FILE_SIZE_MB'])
 
 if __name__ == '__main__':
     app.run(debug=True)

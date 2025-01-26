@@ -14,6 +14,7 @@ from app import app
 def client():
     app.config['TESTING'] = True
     app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB for testing
+    app.config['MAX_FILE_SIZE_MB'] = 10  # Set MAX_FILE_SIZE_MB to match test configuration
     with app.test_client() as client:
         yield client
 
