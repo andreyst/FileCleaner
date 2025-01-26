@@ -13,6 +13,7 @@ from app import app
 @pytest.fixture
 def client():
     app.config['TESTING'] = True
+    app.config['MAX_CONTENT_LENGTH'] = 10 * 1024 * 1024  # 10MB for testing
     with app.test_client() as client:
         yield client
 

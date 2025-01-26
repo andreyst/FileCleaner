@@ -9,7 +9,7 @@ def test_homepage(client):
     response = client.get('/')
     assert response.status_code == 200
     assert b'Upload and Process Files' in response.data
-    assert b'max 200MB' in response.data
+    assert b'max 10MB' in response.data  # Test against test configuration
 
 def test_upload_without_file(client):
     """Test upload without file"""
@@ -44,8 +44,8 @@ def test_process_filename(client, mock_s3_bucket, sample_epub):
 
 def test_file_size_limit(client):
     """Test file size limit"""
-    # Create a file larger than MAX_FILE_SIZE_MB
-    large_file = BytesIO(b'PK\x03\x04' + b'x' * (201 * 1024 * 1024))  # 201MB file with ZIP header
+    # Create a file larger than test MAX_CONTENT_LENGTH (10MB)
+    large_file = BytesIO(b'PK\x03\x04' + b'x' * (11 * 1024 * 1024))  # 11MB file with ZIP header
     data = {
         'files': (large_file, 'large.epub'),
         'strings': ['test']
