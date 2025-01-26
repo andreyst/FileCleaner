@@ -8,8 +8,8 @@ def test_homepage(client):
     """Test that homepage loads correctly"""
     response = client.get('/')
     assert response.status_code == 200
-    assert b'Upload and Clean Files' in response.data
-    assert b'Max file size: 10MB' in response.data  # Test against test configuration
+    assert b'EPUB File Cleaner' in response.data
+    assert b'Maximum file size: 10MB' in response.data  # Test against test configuration
 
 def test_upload_without_file(client):
     """Test upload without file"""
