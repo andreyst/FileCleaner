@@ -25,6 +25,25 @@
         button:hover {
             background-color: #45a049;
         }
+        .suggestions {
+            margin-top: 10px;
+        }
+        .suggestion {
+            display: inline-block;
+            background: #f0f0f0;
+            padding: 5px 10px;
+            margin: 0 5px 5px 0;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .suggestion:hover {
+            background: #e0e0e0;
+        }
+        .suggestion .remove {
+            margin-left: 5px;
+            color: #666;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -38,8 +57,9 @@
         <div class="form-group">
             <label>Strings to remove:</label>
             <div class="string-inputs">
-                <input type="text" name="strings" placeholder="Enter string to remove">
+                <input type="text" name="strings" placeholder="Enter string to remove" onkeydown="handleInputKeydown(event)">
             </div>
+            <div class="suggestions" id="stringSuggestions"></div>
             <button type="button" onclick="addStringInput()">Add Another String</button>
         </div>
 
@@ -52,15 +72,82 @@
     </form>
 
     <script>
-        function addStringInput() {
+        // Load saved strings from localStorage
+        let savedStrings = JSON.parse(localStorage.getItem('savedStrings') || '[]');
+        
+        // Update suggestions display
+        function updateSuggestions() {
+            const suggestionsDiv = document.getElementById('stringSuggestions');
+            suggestionsDiv.innerHTML = '';
+            
+            // Show only the last 20 suggestions
+            savedStrings.slice(-20).forEach(str => {
+                const suggestion = document.createElement('span');
+                suggestion.className = 'suggestion';
+                suggestion.innerHTML = `${str}<span class="remove" onclick="removeString('${str}')">×</span>`;
+                suggestion.onclick = (e) => {
+                    if (!e.target.classList.contains('remove')) {
+                        addStringWithValue(str);
+                    }
+                };
+                suggestionsDiv.appendChild(suggestion);
+            });
+        }
+
+        // Add string to localStorage
+        function saveString(value) {
+            if (value && !savedStrings.includes(value)) {
+                savedStrings.push(value);
+                localStorage.setItem('savedStrings', JSON.stringify(savedStrings));
+                updateSuggestions();
+            }
+        }
+
+        // Remove string from localStorage
+        function removeString(value) {
+            savedStrings = savedStrings.filter(s => s !== value);
+            localStorage.setItem('savedStrings', JSON.stringify(savedStrings));
+            updateSuggestions();
+        }
+
+        // Handle input keydown
+        function handleInputKeydown(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                saveString(event.target.value);
+                event.target.value = '';
+            }
+        }
+
+        // Add string input with value
+        function addStringWithValue(value) {
             const div = document.createElement('div');
             div.className = 'string-inputs';
-            div.innerHTML = '<input type="text" name="strings" placeholder="Enter string to remove">';
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.name = 'strings';
+            input.value = value;
+            input.placeholder = 'Enter string to remove';
+            input.onkeydown = handleInputKeydown;
+            div.appendChild(input);
             document.querySelector('.string-inputs').parentNode.insertBefore(
-                div, 
+                div,
                 document.querySelector('button[type="button"]')
             );
         }
+
+        function addStringInput() {
+            const div = document.createElement('div');
+            div.className = 'string-inputs';
+            div.innerHTML = '<input type="text" name="strings" placeholder="Enter string to remove" onkeydown="handleInputKeydown(event)">';
+            document.querySelector('.string-inputs').parentNode.insertBefore(
+                div,
+                document.querySelector('button[type="button"]')
+            );
+        }
+
+        // Initialize suggestions on page load
+        document.addEventListener('DOMContentLoaded', updateSuggestions);
     </script>
 </body>
 </html>
