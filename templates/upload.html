@@ -51,13 +51,25 @@
     
     <form action="/?process=true" method="POST" enctype="multipart/form-data" onsubmit="return handleSubmit(event)">
         <div class="mb-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Select EPUB files:</label>
-            <input type="file" 
-                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" 
-                   name="files" 
-                   multiple 
-                   required 
-                   accept=".epub">
+            <label class="block text-sm font-medium text-gray-700 mb-2">EPUB files:</label>
+            <div id="dropZone" 
+                 class="relative border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
+                <input type="file" 
+                       id="fileInput"
+                       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" 
+                       name="files" 
+                       multiple 
+                       required 
+                       accept=".epub">
+                <div class="space-y-2">
+                    <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
+                    <div class="text-gray-600">
+                        <span class="font-medium text-blue-600">Click to upload</span> or drag and drop
+                        <div class="text-sm text-gray-500">EPUB files only (max {{ max_file_size_mb }}MB)</div>
+                    </div>
+                </div>
+            </div>
+            <div id="fileList" class="mt-4 space-y-2"></div>
         </div>
         
         <div class="mb-6">
@@ -213,8 +225,90 @@
             return true;
         }
 
+        // File upload handling
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        let files = new Set();
+
+        function updateFileList() {
+            fileList.innerHTML = '';
+            files.forEach(file => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'flex items-center justify-between p-2 bg-gray-50 rounded-lg';
+                fileItem.innerHTML = `
+                    <div class="flex items-center">
+                        <i class="fas fa-file-epub text-blue-500 mr-2"></i>
+                        <span class="text-sm text-gray-700">${file.name}</span>
+                        <span class="text-xs text-gray-500 ml-2">${(file.size / (1024 * 1024)).toFixed(1)}MB</span>
+                    </div>
+                    <button type="button" 
+                            class="text-red-500 hover:text-red-700 transition-colors"
+                            onclick="removeFile('${file.name}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                fileList.appendChild(fileItem);
+            });
+
+            // Update dropzone message
+            const dropZoneText = document.querySelector('#dropZone .text-gray-600');
+            if (files.size > 0) {
+                dropZoneText.innerHTML = 'Add more files or drop them here';
+            } else {
+                dropZoneText.innerHTML = '<span class="font-medium text-blue-600">Click to upload</span> or drag and drop<div class="text-sm text-gray-500">EPUB files only (max {{ max_file_size_mb }}MB)</div>';
+            }
+        }
+
+        function addFiles(newFiles) {
+            Array.from(newFiles).forEach(file => {
+                if (file.type === 'application/epub+zip' || file.name.endsWith('.epub')) {
+                    files.add(file);
+                }
+            });
+            updateFileList();
+            // Update the file input
+            const dt = new DataTransfer();
+            files.forEach(file => dt.items.add(file));
+            fileInput.files = dt.files;
+        }
+
+        function removeFile(fileName) {
+            files = new Set(Array.from(files).filter(file => file.name !== fileName));
+            updateFileList();
+            // Update the file input
+            const dt = new DataTransfer();
+            files.forEach(file => dt.items.add(file));
+            fileInput.files = dt.files;
+        }
+
+        // Handle file selection
+        fileInput.addEventListener('change', (e) => {
+            addFiles(e.target.files);
+        });
+
+        // Handle drag and drop
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('border-blue-500', 'bg-blue-50');
+        });
+
+        dropZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+            addFiles(e.dataTransfer.files);
+        });
+
         // Initialize suggestions on page load
-        document.addEventListener('DOMContentLoaded', updateSuggestions);
+        document.addEventListener('DOMContentLoaded', () => {
+            updateSuggestions();
+            updateFileList();
+        });
     </script>
 </body>
 </html>
