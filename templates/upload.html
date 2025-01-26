@@ -157,10 +157,7 @@
             div.appendChild(input);
             div.appendChild(removeBtn);
             
-            document.getElementById('strings-container').insertBefore(
-                div,
-                document.querySelector('button[type="button"]')
-            );
+            document.getElementById('strings-container').appendChild(div);
         }
 
         function removeStringInput(button) {
