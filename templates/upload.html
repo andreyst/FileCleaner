@@ -78,11 +78,14 @@
                 <div class="flex items-center space-x-2">
                     <input type="text" 
                            name="strings" 
-                           class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
+                           class="flex-1 px-4 py-2 rounded-lg border border-gray-300 bg-white shadow-sm 
+                                  placeholder:text-gray-400 
+                                  focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none
+                                  hover:border-gray-400 transition-colors" 
                            placeholder="Enter text to remove" 
                            onkeydown="handleInputKeydown(event)">
                     <button type="button" 
-                            class="p-2 text-red-600 hover:text-red-800 transition-colors" 
+                            class="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-red-50" 
                             onclick="removeStringInput(this)">
                         <i class="fas fa-times"></i>
                     </button>
@@ -204,8 +207,19 @@
             const div = document.createElement('div');
             div.className = 'string-inputs';
             div.innerHTML = `
-                <input type="text" name="strings" placeholder="Enter string to remove" onkeydown="handleInputKeydown(event)">
-                <button type="button" class="remove-btn" onclick="removeStringInput(this)">×</button>
+                <input type="text" 
+                       name="strings" 
+                       class="flex-1 px-4 py-2 rounded-lg border border-gray-300 bg-white shadow-sm 
+                              placeholder:text-gray-400 
+                              focus:border-blue-500 focus:ring-2 focus:ring-blue-200 focus:outline-none
+                              hover:border-gray-400 transition-colors"
+                       placeholder="Enter text to remove" 
+                       onkeydown="handleInputKeydown(event)">
+                <button type="button" 
+                        class="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-full hover:bg-red-50" 
+                        onclick="removeStringInput(this)">
+                    <i class="fas fa-times"></i>
+                </button>
             `;
             document.getElementById('strings-container').appendChild(div);
         }
