@@ -13,7 +13,7 @@ load_dotenv()
 
 app = Flask(__name__)
 # Get max file size from environment or use default
-MAX_FILE_SIZE_MB = int(os.getenv('MAX_FILE_SIZE_MB', 10))
+MAX_FILE_SIZE_MB = int(os.getenv('MAX_FILE_SIZE_MB', 200))
 app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE_MB * 1024 * 1024  # Convert MB to bytes
 
 s3 = boto3.client('s3')
