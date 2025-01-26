@@ -17,19 +17,26 @@ def process_file(file, strings_to_remove, process_filename):
         for s in strings_to_remove:
             filename = filename.replace(s, '')
     
-    # Read and process file content
+    # Read file content as binary
     content = file.read()
-    if isinstance(content, bytes):
-        content = content.decode('utf-8')
     
-    for s in strings_to_remove:
-        content = content.replace(s, '')
+    # Only process text if strings need to be removed
+    if strings_to_remove:
+        try:
+            # Try to decode as text if strings need to be removed
+            text_content = content.decode('utf-8')
+            for s in strings_to_remove:
+                text_content = text_content.replace(s, '')
+            content = text_content.encode('utf-8')
+        except UnicodeDecodeError:
+            # If file is binary, skip string replacement
+            pass
     
     # Upload to S3
     s3.put_object(
         Bucket=os.getenv('S3_BUCKET'),
         Key=filename,
-        Body=content.encode('utf-8')
+        Body=content
     )
     
     return filename
