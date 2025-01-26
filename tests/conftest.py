@@ -4,7 +4,7 @@ import tempfile
 from pathlib import Path
 import zipfile
 import boto3
-from moto.s3 import mock_s3
+from moto import mock_aws
 from app import app
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def client():
 
 @pytest.fixture
 def mock_s3_bucket():
-    with mock_s3():
+    with mock_aws():
         s3 = boto3.client('s3')
         s3.create_bucket(Bucket='test-bucket')
         os.environ['S3_BUCKET'] = 'test-bucket'
