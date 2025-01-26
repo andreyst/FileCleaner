@@ -143,7 +143,7 @@ def process_file(file, strings_to_remove, process_filename):
 def upload_file():
     if request.method == 'POST':
         if request.args.get('process'):
-            if 'files' not in request.files:
+            if 'files' not in request.files or not request.files.getlist('files')[0].filename:
                 return 'No files uploaded', 400
             
             files = request.files.getlist('files')

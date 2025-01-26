@@ -13,7 +13,7 @@ def test_homepage(client):
 
 def test_upload_without_file(client):
     """Test upload without file"""
-    response = client.post('/', follow_redirects=True)
+    response = client.post('/?process=true', data={}, content_type='multipart/form-data')
     assert response.status_code == 400
     assert b'No files uploaded' in response.data
 
