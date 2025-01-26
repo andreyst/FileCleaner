@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Upload and Process</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .string-inputs {
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload and Process Files</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="form-group">
+            <label>Select files (max 15MB each):</label><br>
+            <input type="file" name="files" multiple required>
+        </div>
+        
+        <div class="form-group">
+            <label>Strings to remove:</label>
+            <div class="string-inputs">
+                <input type="text" name="strings" placeholder="Enter string to remove">
+            </div>
+            <button type="button" onclick="addStringInput()">Add Another String</button>
+        </div>
+
+        <div class="form-group">
+            <input type="checkbox" name="process_filename" id="process_filename">
+            <label for="process_filename">Also remove strings from filenames</label>
+        </div>
+
+        <button type="submit">Upload and Process</button>
+    </form>
+
+    <script>
+        function addStringInput() {
+            const div = document.createElement('div');
+            div.className = 'string-inputs';
+            div.innerHTML = '<input type="text" name="strings" placeholder="Enter string to remove">';
+            document.querySelector('.string-inputs').parentNode.insertBefore(
+                div, 
+                document.querySelector('button[type="button"]')
+            );
+        }
+    </script>
+</body>
+</html>

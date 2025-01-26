@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Processing Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .success {
+            color: green;
+            margin-bottom: 20px;
+        }
+        .file-list {
+            margin-bottom: 20px;
+        }
+        .back-button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Files Processed Successfully</h1>
+    <div class="success">
+        The following files have been processed and uploaded to S3:
+    </div>
+    <div class="file-list">
+        <ul>
+            {% for file in processed_files %}
+            <li>{{ file }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <a href="/" class="back-button">Process More Files</a>
+</body>
+</html>
