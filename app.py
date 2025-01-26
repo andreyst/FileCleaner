@@ -125,8 +125,8 @@ def upload_file():
         processed_files = []
         for file in files:
             if file.filename:
-                processed_filename = process_file(file, strings_to_remove, process_filename)
-                processed_files.append(processed_filename)
+                filename, signed_url = process_file(file, strings_to_remove, process_filename)
+                processed_files.append({'name': filename, 'url': signed_url})
         
         return render_template('result.html', processed_files=processed_files)
     
