@@ -4,7 +4,7 @@ import tempfile
 from pathlib import Path
 import zipfile
 import boto3
-from moto import mock_s3
+from moto.s3 import mock_s3
 from app import app
 
 @pytest.fixture
