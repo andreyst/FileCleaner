@@ -48,7 +48,7 @@
 </head>
 <body>
     <h1>Upload and Clean Files</h1>
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" onsubmit="saveStringsOnSubmit(event)">
         <div class="form-group">
             <label>Select files (max {{ max_file_size_mb }}MB each):</label><br>
             <input type="file" name="files" multiple required>
@@ -144,6 +144,16 @@
                 div,
                 document.querySelector('button[type="button"]')
             );
+        }
+
+        // Save all strings when form is submitted
+        function saveStringsOnSubmit(event) {
+            const inputs = document.querySelectorAll('input[name="strings"]');
+            inputs.forEach(input => {
+                if (input.value) {
+                    saveString(input.value);
+                }
+            });
         }
 
         // Initialize suggestions on page load
