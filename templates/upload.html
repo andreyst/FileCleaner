@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>File Upload and Process (Max {{ max_file_size_mb }}MB)</title>
+    <title>File Upload and Clean (Max {{ max_file_size_mb }}MB)</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,7 +28,7 @@
     </style>
 </head>
 <body>
-    <h1>Upload and Process Files</h1>
+    <h1>Upload and Clean Files</h1>
     <form method="POST" enctype="multipart/form-data">
         <div class="form-group">
             <label>Select files (max {{ max_file_size_mb }}MB each):</label><br>
@@ -48,7 +48,7 @@
             <label for="process_filename">Also remove strings from filenames</label>
         </div>
 
-        <button type="submit">Upload and Process</button>
+        <button type="submit">Upload and Clean</button>
     </form>
 
     <script>
