@@ -14,6 +14,20 @@
         }
         .string-inputs {
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .remove-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .remove-btn:hover {
+            background: #cc0000;
         }
         button {
             padding: 10px 20px;
@@ -56,8 +70,11 @@
         
         <div class="form-group">
             <label>Strings to remove:</label>
-            <div class="string-inputs">
-                <input type="text" name="strings" placeholder="Enter string to remove" onkeydown="handleInputKeydown(event)">
+            <div id="strings-container">
+                <div class="string-inputs">
+                    <input type="text" name="strings" placeholder="Enter string to remove" onkeydown="handleInputKeydown(event)">
+                    <button type="button" class="remove-btn" onclick="removeStringInput(this)">×</button>
+                </div>
             </div>
             <div class="suggestions" id="stringSuggestions"></div>
             <button type="button" onclick="addStringInput()">Add Another String</button>
@@ -123,24 +140,46 @@
         function addStringWithValue(value) {
             const div = document.createElement('div');
             div.className = 'string-inputs';
+            
             const input = document.createElement('input');
             input.type = 'text';
             input.name = 'strings';
             input.value = value;
             input.placeholder = 'Enter string to remove';
             input.onkeydown = handleInputKeydown;
+            
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'remove-btn';
+            removeBtn.onclick = function() { removeStringInput(this); };
+            removeBtn.textContent = '×';
+            
             div.appendChild(input);
-            document.querySelector('.string-inputs').parentNode.insertBefore(
+            div.appendChild(removeBtn);
+            
+            document.getElementById('strings-container').insertBefore(
                 div,
                 document.querySelector('button[type="button"]')
             );
         }
 
+        function removeStringInput(button) {
+            const container = button.parentElement;
+            container.remove();
+            if (document.querySelectorAll('.string-inputs').length === 0) {
+                // Add a new empty input if all are removed
+                addStringInput();
+            }
+        }
+
         function addStringInput() {
             const div = document.createElement('div');
             div.className = 'string-inputs';
-            div.innerHTML = '<input type="text" name="strings" placeholder="Enter string to remove" onkeydown="handleInputKeydown(event)">';
-            document.querySelector('.string-inputs').parentNode.insertBefore(
+            div.innerHTML = `
+                <input type="text" name="strings" placeholder="Enter string to remove" onkeydown="handleInputKeydown(event)">
+                <button type="button" class="remove-btn" onclick="removeStringInput(this)">×</button>
+            `;
+            document.getElementById('strings-container').insertBefore(
                 div,
                 document.querySelector('button[type="button"]')
             );
