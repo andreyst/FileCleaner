@@ -203,9 +203,9 @@
         }
 
         function removeStringInput(button) {
-            const container = button.parentElement;
+            const container = button.closest('.flex.items-center.space-x-2');
             container.remove();
-            if (document.querySelectorAll('.string-inputs').length === 0) {
+            if (document.querySelectorAll('.flex.items-center.space-x-2').length === 0) {
                 // Add a new empty input if all are removed
                 addStringInput();
             }
@@ -213,7 +213,7 @@
 
         function addStringInput() {
             const div = document.createElement('div');
-            div.className = 'string-inputs';
+            div.className = 'flex items-center space-x-2';
             div.innerHTML = `
                 <input type="text" 
                        name="strings" 
