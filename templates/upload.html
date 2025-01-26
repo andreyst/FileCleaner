@@ -85,12 +85,19 @@
         </div>
 
         <div class="mb-6">
-            <label class="inline-flex items-center">
+            <label class="inline-flex items-center group cursor-pointer">
                 <input type="checkbox" 
-                       class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
+                       class="peer sr-only" 
                        name="process_filename" 
                        id="process_filename">
-                <span class="ml-2 text-sm text-gray-600">Also remove text from filenames</span>
+                <div class="w-5 h-5 border-2 border-gray-300 rounded transition-colors 
+                            peer-checked:bg-blue-500 peer-checked:border-blue-500
+                            group-hover:border-blue-400
+                            after:content-[''] after:block after:w-2 after:h-3 
+                            after:border-r-2 after:border-b-2 after:border-white
+                            after:rotate-45 after:opacity-0 after:ml-1 
+                            peer-checked:after:opacity-100"></div>
+                <span class="ml-2 text-sm text-gray-600 group-hover:text-gray-900">Also remove text from filenames</span>
             </label>
         </div>
 
