@@ -23,6 +23,13 @@
             text-decoration: none;
             display: inline-block;
         }
+        .file-list a {
+            color: #2196F3;
+            text-decoration: none;
+        }
+        .file-list a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -33,7 +40,10 @@
     <div class="file-list">
         <ul>
             {% for file in processed_files %}
-            <li>{{ file }}</li>
+            <li>
+                {{ file.name }} - 
+                <a href="{{ file.url }}" target="_blank">Download (link expires in 1 hour)</a>
+            </li>
             {% endfor %}
         </ul>
     </div>
