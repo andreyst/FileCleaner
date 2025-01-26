@@ -13,12 +13,13 @@
             animation: spin 1s linear infinite;
         }
         .suggestion {
-            @apply inline-flex items-center px-3 py-1.5 rounded-full bg-blue-50 text-sm text-blue-700 
-                   hover:bg-blue-100 cursor-pointer transition-colors border border-blue-100
-                   hover:border-blue-200;
+            @apply inline-flex items-center px-3 py-1.5 rounded-full bg-gray-100 text-sm text-gray-700 
+                   hover:bg-gray-200 cursor-pointer transition-colors border border-gray-200
+                   hover:border-gray-300;
         }
         .suggestion .remove {
-            @apply ml-2 text-blue-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity;
+            @apply ml-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity
+                   w-4 h-4 flex items-center justify-center rounded-full hover:bg-red-100;
         }
     </style>
 </head>
@@ -141,7 +142,7 @@
             savedStrings.slice(-20).forEach(str => {
                 const suggestion = document.createElement('span');
                 suggestion.className = 'suggestion group';
-                suggestion.innerHTML = `${str}<span class="remove" onclick="removeString('${str}')">×</span>`;
+                suggestion.innerHTML = `${str}<span class="remove" onclick="removeString('${str}')"><i class="fas fa-times text-xs"></i></span>`;
                 suggestion.onclick = (e) => {
                     if (!e.target.classList.contains('remove')) {
                         addStringWithValue(str);
