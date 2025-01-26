@@ -16,66 +16,81 @@
 </head>
 <body>
     <div class="max-w-4xl mx-auto my-10 p-8 bg-white rounded-xl shadow-lg">
-        <div class="text-center mb-8 p-6 bg-gray-50 rounded-lg">
-            <h1 class="text-3xl font-bold mb-3 text-gray-800">EPUB File Cleaner</h1>
-            <p class="text-lg text-gray-600">Remove unwanted text from your EPUB files securely and easily</p>
+        <div class="text-center mb-8 p-8 bg-gradient-to-b from-blue-50 to-white rounded-xl border border-blue-100">
+            <h1 class="text-4xl font-bold mb-4 text-gray-800">EPUB File Cleaner</h1>
+            <p class="text-xl text-gray-600 mb-6">Upload your EPUB files and remove unwanted text instantly</p>
+            
+            <div class="text-left max-w-2xl mx-auto space-y-2 text-sm text-gray-600">
+                <p class="flex items-center">
+                    <i class="fas fa-shield-alt w-5 text-blue-500"></i>
+                    <span class="ml-2">Files are processed securely and deleted after 24 hours</span>
+                </p>
+                <p class="flex items-center">
+                    <i class="fas fa-history w-5 text-blue-500"></i>
+                    <span class="ml-2">Previous text strings are saved locally for convenience</span>
+                </p>
+                <p class="flex items-center">
+                    <i class="fas fa-file-upload w-5 text-blue-500"></i>
+                    <span class="ml-2">Maximum file size: {{ max_file_size_mb }}MB</span>
+                </p>
+            </div>
         </div>
-
-        <div class="mb-8 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
-            <h5 class="font-semibold mb-2">How it works:</h5>
-            <ul class="space-y-1">
-                <li>Upload your EPUB files (up to {{ max_file_size_mb }}MB each)</li>
-                <li>Enter the text strings you want to remove</li>
-                <li>Get your cleaned files instantly</li>
-            </ul>
-        </div>
-
-        <div class="mb-8 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
-            <h5 class="font-semibold mb-2">Important Information:</h5>
-            <ul class="space-y-1">
-                <li>Your files are processed securely and privately</li>
-                <li>Processed files are automatically deleted after 24 hours</li>
-                <li>Your previous text strings are saved locally for convenience</li>
-            </ul>
-        </div>
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
-            <h2>Processing Your Files</h2>
-            <div class="loader"></div>
-            <div class="message">Please wait while we process your files...</div>
+    <div class="fixed inset-0 bg-gray-800 bg-opacity-75 hidden items-center justify-center" id="loadingOverlay">
+        <div class="bg-white p-8 rounded-lg shadow-xl text-center">
+            <h2 class="text-2xl font-bold mb-4">Processing Your Files</h2>
+            <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div class="text-gray-600">Please wait while we process your files...</div>
         </div>
     </div>
     
     <form action="/?process=true" method="POST" enctype="multipart/form-data" onsubmit="return handleSubmit(event)">
-        <div class="mb-4">
-            <label class="form-label">Select EPUB files:</label>
-            <input type="file" class="form-control" name="files" multiple required accept=".epub">
-            <div class="form-text">Maximum file size: {{ max_file_size_mb }}MB</div>
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Select EPUB files:</label>
+            <input type="file" 
+                   class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" 
+                   name="files" 
+                   multiple 
+                   required 
+                   accept=".epub">
         </div>
         
-        <div class="mb-4">
-            <label class="form-label">Text to remove:</label>
-            <div id="strings-container">
-                <div class="string-inputs">
-                    <input type="text" name="strings" placeholder="Enter string to remove" onkeydown="handleInputKeydown(event)">
-                    <button type="button" class="remove-btn" onclick="removeStringInput(this)">×</button>
+        <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Text to remove:</label>
+            <div id="strings-container" class="space-y-2">
+                <div class="flex items-center space-x-2">
+                    <input type="text" 
+                           name="strings" 
+                           class="flex-1 rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
+                           placeholder="Enter text to remove" 
+                           onkeydown="handleInputKeydown(event)">
+                    <button type="button" 
+                            class="p-2 text-red-600 hover:text-red-800 transition-colors" 
+                            onclick="removeStringInput(this)">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
             </div>
-            <div class="suggestions" id="stringSuggestions"></div>
-            <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="addStringInput()">
-                <i class="bi bi-plus-circle"></i> Add Another Text String
+            <div id="stringSuggestions" class="mt-3 space-x-2"></div>
+            <button type="button" 
+                    class="mt-3 inline-flex items-center px-3 py-2 border border-blue-500 text-sm font-medium rounded-md text-blue-500 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" 
+                    onclick="addStringInput()">
+                <i class="fas fa-plus mr-2"></i> Add Another Text String
             </button>
         </div>
 
-        <div class="mb-4">
-            <div class="form-check">
-                <input type="checkbox" class="form-check-input" name="process_filename" id="process_filename">
-                <label class="form-check-label" for="process_filename">Also remove text from filenames</label>
-            </div>
+        <div class="mb-6">
+            <label class="inline-flex items-center">
+                <input type="checkbox" 
+                       class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500" 
+                       name="process_filename" 
+                       id="process_filename">
+                <span class="ml-2 text-sm text-gray-600">Also remove text from filenames</span>
+            </label>
         </div>
 
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-cloud-upload"></i> Upload and Clean Files
+        <button type="submit" 
+                class="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+            <i class="fas fa-cloud-upload-alt mr-2"></i> Upload and Clean Files
         </button>
     </form>
 
