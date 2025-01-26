@@ -142,7 +142,7 @@ def process_file(file, strings_to_remove, process_filename):
 @app.route('/', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
-        if request.args.get('process'):
+        # Remove the processing page step
             if 'files' not in request.files or not request.files.getlist('files')[0].filename:
                 return 'No files uploaded', 400
             

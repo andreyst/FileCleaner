@@ -58,11 +58,48 @@
             color: #666;
             font-weight: bold;
         }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            z-index: 1000;
+        }
+        .loading-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+        .loader {
+            border: 8px solid #f3f3f3;
+            border-top: 8px solid #4CAF50;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
     <h1>Upload and Clean Files</h1>
-    <form action="/?process=true" method="POST" enctype="multipart/form-data" onsubmit="saveStringsOnSubmit(event)">
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <h2>Processing Your Files</h2>
+            <div class="loader"></div>
+            <div class="message">Please wait while we process your files...</div>
+        </div>
+    </div>
+    <form action="/?process=true" method="POST" enctype="multipart/form-data" onsubmit="return handleSubmit(event)">
         <div class="form-group">
             <label>Select files (max {{ max_file_size_mb }}MB each):</label><br>
             <input type="file" name="files" multiple required>
@@ -179,14 +216,19 @@
             document.getElementById('strings-container').appendChild(div);
         }
 
-        // Save all strings when form is submitted
-        function saveStringsOnSubmit(event) {
+        // Handle form submission
+        function handleSubmit(event) {
+            // Save strings to localStorage
             const inputs = document.querySelectorAll('input[name="strings"]');
             inputs.forEach(input => {
                 if (input.value) {
                     saveString(input.value);
                 }
             });
+
+            // Show loading overlay
+            document.getElementById('loadingOverlay').style.display = 'block';
+            return true;
         }
 
         // Initialize suggestions on page load
