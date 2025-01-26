@@ -2,6 +2,7 @@ import os
 import tempfile
 import shutil
 import zipfile
+import uuid
 from pathlib import Path
 from flask import Flask, request, render_template, send_file
 import boto3
@@ -15,13 +16,13 @@ app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 200MB max file size
 
 s3 = boto3.client('s3')
 
-def get_signed_url(filename, expiration=3600):
+def get_signed_url(s3_key, expiration=3600):
     """Generate a signed URL for an S3 object that expires in 1 hour"""
     url = s3.generate_presigned_url(
         'get_object',
         Params={
             'Bucket': os.getenv('S3_BUCKET'),
-            'Key': filename
+            'Key': s3_key
         },
         ExpiresIn=expiration
     )
@@ -30,11 +31,17 @@ def get_signed_url(filename, expiration=3600):
 def process_file(file, strings_to_remove, process_filename):
     print(f"\nProcessing EPUB file: {file.filename}")
     
+    # Create unique directory for this upload
+    upload_id = str(uuid.uuid4())
+    s3_dir = f"uploads/{upload_id}"
+    
     filename = secure_filename(file.filename)
     if process_filename:
         for s in strings_to_remove:
             filename = filename.replace(s, '')
         print(f"Processed filename: {filename}")
+    
+    s3_key = f"{s3_dir}/{filename}"
     
     # Create temporary directory for EPUB processing
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -99,17 +106,17 @@ def process_file(file, strings_to_remove, process_filename):
                     new_epub.write(path, arcname)
         
         # Upload to S3
-        print(f"Uploading to S3: {filename}")
+        print(f"Uploading to S3: {s3_key}")
         with open(processed_path, 'rb') as f:
             s3.put_object(
                 Bucket=os.getenv('S3_BUCKET'),
-                Key=filename,
+                Key=s3_key,
                 Body=f.read()
             )
         print("Upload complete")
         
         # Generate signed URL and return
-        signed_url = get_signed_url(filename)
+        signed_url = get_signed_url(s3_key)
         return filename, signed_url
 
 @app.route('/', methods=['GET', 'POST'])
