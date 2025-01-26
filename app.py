@@ -3,7 +3,6 @@ from flask import Flask, request, render_template, send_file
 import boto3
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
-import sys
 
 load_dotenv()
 
@@ -51,28 +50,12 @@ def process_file(file, strings_to_remove, process_filename):
     
     # Upload to S3
     print(f"Uploading to S3: {filename}")
-    
-    class ProgressPercentage:
-        def __init__(self, total_bytes):
-            self._total_bytes = total_bytes
-            self._uploaded_bytes = 0
-            self._last_percent = 0
-
-        def __call__(self, bytes_amount):
-            self._uploaded_bytes += bytes_amount
-            percent = int((self._uploaded_bytes / self._total_bytes) * 100)
-            if percent > self._last_percent:
-                print(f"Upload progress: {percent}%")
-                self._last_percent = percent
-                sys.stdout.flush()
-
     s3.put_object(
         Bucket=os.getenv('S3_BUCKET'),
         Key=filename,
-        Body=content,
-        Callback=ProgressPercentage(len(content))
+        Body=content
     )
-    print("Upload complete (100%)")
+    print("Upload complete")
     
     return filename
 
