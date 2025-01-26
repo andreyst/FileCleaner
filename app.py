@@ -12,7 +12,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 200MB max file size
+# Get max file size from environment or use default
+MAX_FILE_SIZE_MB = int(os.getenv('MAX_FILE_SIZE_MB', 10))
+app.config['MAX_CONTENT_LENGTH'] = MAX_FILE_SIZE_MB * 1024 * 1024  # Convert MB to bytes
 
 s3 = boto3.client('s3')
 
@@ -135,9 +137,9 @@ def upload_file():
                 filename, signed_url = process_file(file, strings_to_remove, process_filename)
                 processed_files.append({'name': filename, 'url': signed_url})
         
-        return render_template('result.html', processed_files=processed_files)
+        return render_template('result.html', processed_files=processed_files, max_file_size_mb=MAX_FILE_SIZE_MB)
     
-    return render_template('upload.html')
+    return render_template('upload.html', max_file_size_mb=MAX_FILE_SIZE_MB)
 
 if __name__ == '__main__':
     app.run(debug=True)
