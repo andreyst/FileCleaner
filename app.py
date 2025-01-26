@@ -3,6 +3,7 @@ from flask import Flask, request, render_template, send_file
 import boto3
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
+import sys
 
 load_dotenv()
 
@@ -30,22 +31,48 @@ def process_file(file, strings_to_remove, process_filename):
             # Try to decode as text if strings need to be removed
             text_content = content.decode('utf-8')
             print("File decoded as text, processing strings...")
+            total_len = len(text_content)
+            processed_len = 0
+            last_percent = 0
+            
             for s in strings_to_remove:
                 text_content = text_content.replace(s, '')
+                processed_len += len(s)
+                percent = min(99, int((processed_len / total_len) * 100))
+                if percent > last_percent:
+                    print(f"Processing strings: {percent}%")
+                    last_percent = percent
+            
             content = text_content.encode('utf-8')
-            print("String processing complete")
+            print("String processing complete (100%)")
         except UnicodeDecodeError:
             print("Binary file detected, skipping string replacement")
             pass
     
     # Upload to S3
     print(f"Uploading to S3: {filename}")
+    
+    class ProgressPercentage:
+        def __init__(self, total_bytes):
+            self._total_bytes = total_bytes
+            self._uploaded_bytes = 0
+            self._last_percent = 0
+
+        def __call__(self, bytes_amount):
+            self._uploaded_bytes += bytes_amount
+            percent = int((self._uploaded_bytes / self._total_bytes) * 100)
+            if percent > self._last_percent:
+                print(f"Upload progress: {percent}%")
+                self._last_percent = percent
+                sys.stdout.flush()
+
     s3.put_object(
         Bucket=os.getenv('S3_BUCKET'),
         Key=filename,
-        Body=content
+        Body=content,
+        Callback=ProgressPercentage(len(content))
     )
-    print("Upload complete")
+    print("Upload complete (100%)")
     
     return filename
 
