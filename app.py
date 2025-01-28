@@ -1,6 +1,13 @@
+"""
+EPUB File Cleaner Application
+
+This Flask application allows users to upload EPUB files, remove specified text strings
+from their content, and download the processed files via S3 signed URLs.
+"""
+
+from typing import List, Dict, Tuple, Optional
 import os
 import tempfile
-import shutil
 import zipfile
 import uuid
 from pathlib import Path
@@ -19,8 +26,17 @@ app.config['MAX_FILE_SIZE_MB'] = MAX_FILE_SIZE_MB  # Store in config for templat
 
 s3 = boto3.client('s3')
 
-def get_signed_url(s3_key, expiration=3600):
-    """Generate a signed URL for an S3 object that expires in 1 hour"""
+def get_signed_url(s3_key: str, expiration: int = 3600) -> str:
+    """
+    Generate a signed URL for an S3 object.
+    
+    Args:
+        s3_key: The key (path) of the object in S3
+        expiration: Number of seconds until URL expires (default: 1 hour)
+    
+    Returns:
+        str: Signed URL for downloading the object
+    """
     url = s3.generate_presigned_url(
         'get_object',
         Params={
@@ -31,8 +47,17 @@ def get_signed_url(s3_key, expiration=3600):
     )
     return url
 
-def process_text_content(content, strings_to_remove):
-    """Process text content by removing specified strings"""
+def process_text_content(content: str, strings_to_remove: List[str]) -> str:
+    """
+    Process text content by removing specified strings.
+    
+    Args:
+        content: The text content to process
+        strings_to_remove: List of strings to remove from the content
+    
+    Returns:
+        str: Processed content with specified strings removed
+    """
     if not strings_to_remove:
         return content
     
@@ -50,8 +75,18 @@ def process_text_content(content, strings_to_remove):
     
     return content
 
-def process_epub_file(extract_dir, strings_to_remove):
-    """Process all text files in extracted EPUB directory"""
+def process_epub_file(extract_dir: str, strings_to_remove: List[str]) -> None:
+    """
+    Process all text files in extracted EPUB directory.
+    
+    Walks through the extracted EPUB directory and processes all text files
+    by removing specified strings. Handles various text-based file types
+    commonly found in EPUB files.
+    
+    Args:
+        extract_dir: Path to directory containing extracted EPUB files
+        strings_to_remove: List of strings to remove from text content
+    """
     text_extensions = {'.xhtml', '.html', '.htm', '.xml', '.css', '.txt', '.opf', '.ncx'}
     total_files = sum(1 for _ in Path(extract_dir).rglob('*') 
                      if Path(_).suffix.lower() in text_extensions)
@@ -75,8 +110,17 @@ def process_epub_file(extract_dir, strings_to_remove):
                 print(f"Skipping binary file: {path.name}")
                 continue
 
-def create_processed_epub(extract_dir, output_path):
-    """Create new EPUB from processed files"""
+def create_processed_epub(extract_dir: str, output_path: str) -> None:
+    """
+    Create new EPUB from processed files.
+    
+    Zips processed files back into EPUB format while maintaining
+    the original directory structure.
+    
+    Args:
+        extract_dir: Directory containing processed files
+        output_path: Path where the new EPUB file should be created
+    """
     print("\nCreating processed EPUB")
     with zipfile.ZipFile(output_path, 'w', zipfile.ZIP_DEFLATED) as new_epub:
         for path in Path(extract_dir).rglob('*'):
@@ -84,8 +128,20 @@ def create_processed_epub(extract_dir, output_path):
                 arcname = str(path.relative_to(extract_dir))
                 new_epub.write(path, arcname)
 
-def upload_to_s3(file_path, s3_key):
-    """Upload file to S3 and return signed URL"""
+def upload_to_s3(file_path: str, s3_key: str) -> str:
+    """
+    Upload file to S3 and return signed URL.
+    
+    Args:
+        file_path: Local path to file for upload
+        s3_key: Destination key (path) in S3
+        
+    Returns:
+        str: Signed URL for downloading the uploaded file
+        
+    Raises:
+        boto3.exceptions.S3UploadFailedError: If upload fails
+    """
     print(f"Uploading to S3: {s3_key}")
     with open(file_path, 'rb') as f:
         s3.put_object(
@@ -96,8 +152,25 @@ def upload_to_s3(file_path, s3_key):
     print("Upload complete")
     return get_signed_url(s3_key)
 
-def process_file(file, strings_to_remove, process_filename):
-    """Main function to process uploaded EPUB file"""
+def process_file(file, strings_to_remove: List[str], process_filename: bool) -> Tuple[str, str]:
+    """
+    Main function to process uploaded EPUB file.
+    
+    Handles the complete workflow of processing an EPUB file:
+    1. Creates temporary working directory
+    2. Extracts EPUB contents
+    3. Processes text content
+    4. Rebuilds EPUB file
+    5. Uploads to S3
+    
+    Args:
+        file: FileStorage object containing the uploaded EPUB
+        strings_to_remove: List of strings to remove from content
+        process_filename: Whether to process the output filename
+        
+    Returns:
+        Tuple[str, str]: (processed filename, signed download URL)
+    """
     print(f"\nProcessing EPUB file: {file.filename}")
     
     # Create unique directory for this upload
